@@ -34,11 +34,13 @@
         	if(pStart == NULL||pEnd == NULL){
         		return ERROR_TAGS_NULL;
         	}
-        	char temp1 = *pStart;
+        	pStartTag = strdup(pStart);
+        	pEndTag = strdup(pEnd);
+        	/*char temp1 = *pStart;
         	char temp2 = *pEnd;
         	*pStartTag = temp1;
         	*pEndTag = temp2;
-        	areTagsSet = true;
+        	areTagsSet = true;*/
         }
         //First clears myVector
         		//going to search thru pDataToSearchThru, looking for info bracketed by
@@ -56,7 +58,26 @@
         	if(pStartTag == NULL||pEndTag == NULL){
         		return ERROR_TAGS_NULL;
         	}
+        	char*endOfTag =0;
+        	std::string message = "";
+        	int endTagLength = strlen(pEndTag);
+        	bool eofFlag = false;
+        	while(!eofFlag){
+        	if(findTag(pStartTag,pDataToSearchThru,endOfTag) == SUCCESS){
+        		pDataToSearchThru = endOfTag;
+        		while(strncmp(pDataToSearchThru,"<",1)){
+        			message.append(pDataToSearchThru);
+        			pDataToSearchThru++;
+        		}
+        		myVector.push_back(message);
+        		pDataToSearchThru = pDataToSearchThru+endTagLength;
+        	}else{
+        		eofFlag = true;
+        	}
+        	}
 
+        	//myVector.push_back();
+        	            return SUCCESS;
         }
 
         void KP_StringParserClass::StringParserClass::cleanup() {
@@ -69,24 +90,31 @@
         		//ERROR_TAGS_NULL if either pStart or pEnd is null
         int KP_StringParserClass::StringParserClass::findTag(char* pTagToLookFor,
                 char*& pStart, char*& pEnd) {
-        	if(pStart == NULL||pEnd == NULL){
+        	if(pStart == NULL){
         		return ERROR_TAGS_NULL;
         	}
         	int sizeS = strlen(pStart);
         	int sizeT = strlen(pTagToLookFor);
-        	for(int i = 0;i <sizeS;i++){
+        	int i = 0;
+        	char* tmp = pTagToLookFor;
+        	char* tmp2= pStart;
+        	while(pStart != ""){
         		if(i+sizeT >sizeS){
         			break;
         		}
-        		if(strcmp(pStart,"<") ==0){
+        		if(strncmp(pStart,"<",1) ==0){
+        			tmp = pTagToLookFor;
+        			tmp2 = pStart;
         			bool flag = true;
 
         			for(int j = 0;j<sizeT;j++){
-        				if(!pStart == pTagToLookFor[j]){
+
+        				if(strncmp(tmp2,tmp,1) !=0){
         					flag = false;
         				}else{
-        					pStart++;
+        					tmp2++;
         					i++;
+        					tmp++;
         				}
         				}
         			if(flag == true){
@@ -95,6 +123,7 @@
         			}
         		}
         		pStart++;
+        		i++;
         	}
         	return FAIL;
         }
