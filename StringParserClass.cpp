@@ -41,6 +41,7 @@
         	*pStartTag = temp1;
         	*pEndTag = temp2;
         	areTagsSet = true;*/
+        	return SUCCESS;
         }
         //First clears myVector
         		//going to search thru pDataToSearchThru, looking for info bracketed by
@@ -52,31 +53,36 @@
         int KP_StringParserClass::StringParserClass::getDataBetweenTags(
                 char* pDataToSearchThru, std::vector<std::string>& myVector) {
         	myVector.clear();
+        	if(pStartTag == NULL||pEndTag == NULL){
+        	    return ERROR_TAGS_NULL;
+        	}
         	if(pDataToSearchThru == NULL){
         		return ERROR_DATA_NULL;
         	}
-        	if(pStartTag == NULL||pEndTag == NULL){
-        		return ERROR_TAGS_NULL;
-        	}
+
         	char*endOfTag =0;
-        	std::string message = "";
+        	std::string message;
         	int endTagLength = strlen(pEndTag);
         	bool eofFlag = false;
+        	bool marked = false;
         	while(!eofFlag){
         	if(findTag(pStartTag,pDataToSearchThru,endOfTag) == SUCCESS){
         		pDataToSearchThru = endOfTag;
-        		while(strncmp(pDataToSearchThru,"<",1)){
-        			message.append(pDataToSearchThru);
+        		message = "";
+        		while(strncmp(pDataToSearchThru,"</",2)){
+        			std::string it = pDataToSearchThru;
+        			std::string str = it.substr(0,1);
+        			message.append(str);
         			pDataToSearchThru++;
         		}
         		myVector.push_back(message);
         		pDataToSearchThru = pDataToSearchThru+endTagLength;
+
         	}else{
         		eofFlag = true;
         	}
         	}
 
-        	//myVector.push_back();
         	            return SUCCESS;
         }
 
